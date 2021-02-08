@@ -1,6 +1,6 @@
 from datetime import datetime
 LOG = True
-PRINT = True
+PRINT = False
 LOG_FILE = '/var/www/FlaskApp/FlaskApp/log.txt'
 
 def print_or_log(message, log_=LOG, print_=PRINT):
