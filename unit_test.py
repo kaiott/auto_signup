@@ -15,6 +15,16 @@ def check_server_status():
       else:
         print(response.text)
 
+def delete_all_entries():
+    response = requests.delete(BASE + 'lessons')
+    try:
+      print(response.json())
+    except:
+      if response.text == '':
+        print(response.status_code)
+      else:
+        print(response.text)
+
 def add_lesson(lesson_id):
     try:
         requests.put(BASE + f'lessons/{lesson_id}', timeout = 0.5)
@@ -109,12 +119,13 @@ def test_on_fakes():
 
 
 def real_test():
+    check_server_status()
     add_lesson(174930) # body combat 09/02
     add_lesson(174938) # muscle pump 10/02
 
 def main():
     #test_on_fakes()
-    #
+    real_test()
 
 if __name__ == "__main__":
     main()

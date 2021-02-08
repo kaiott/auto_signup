@@ -47,6 +47,10 @@ class Lessons(Resource):
         result = LessonModel.query.all()
         return result
 
+    def delete(self):
+        LessonModel.query.delete()
+        return '', 204
+
 class Lesson(Resource):
     @marshal_with(minimal_fields)
     def get(self, lesson_id):
