@@ -2,6 +2,8 @@ from flask import Flask, request
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 import time
+from datetime import datetime, timedelta
+import os.path
 text = 'import worekd'
 try:
     from lesson_handler import handle_lesson
@@ -26,9 +28,18 @@ minimal_fields = {
     'status': fields.Integer
 }
 
+
 class Status(Resource):
-    def check_status(self):
-        return {"status": "running"}
+    def get(self):
+        p = '/var/www/FlaskApp/FlaskApp/token'
+        token_status = 'unacquired'
+        if os.path.exists(p):
+            t = os.path.getmtime(p)
+            d = datetime.fromtimestamp(t)
+            if datetime.now() - d < timedelta(hours=2):
+                token_status = "up_to_date"
+        return {"server_status": "running",
+                "token_status": token_status}
 
 class Lessons(Resource):
     @marshal_with(minimal_fields)
