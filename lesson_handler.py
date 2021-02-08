@@ -75,7 +75,8 @@ def hold(session, model, lesson, enroll_time):
     pause.until(enroll_time.replace(tzinfo=None)-timedelta(seconds=55))
     if model.query.filter_by(lesson_id=lesson).first() is not None:
         print_or_log(f'sending lesson {lesson} from hold to enroll')
-        model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #enroll.enroll(lesson, enroll_time.replace(tzinfo=None)) 
+        model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL 
+        enroll.enroll(lesson, enroll_time.replace(tzinfo=None)) 
         session.commit()
 
 def watch(session, model, lesson):
@@ -86,7 +87,8 @@ def watch(session, model, lesson):
         free_spots, enroll_from, enroll_till = get_infos(lesson)
         if free_spots > 0:
             print_or_log(f'lesson {lesson} has {free_spots} free spots, sending to enroll')
-            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #enroll.enroll(lesson, enroll_from.replace(tzinfo=None))
+            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL 
+            enroll.enroll(lesson, enroll_from.replace(tzinfo=None))
             session.commit()
             break
         sleep(60)
