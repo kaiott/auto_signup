@@ -129,7 +129,7 @@ def main():
     retrieve_all_lessons()
     delete_all_entries()
     retrieve_all_lessons()
-    #real_test()
+    real_test()
 
 if __name__ == "__main__":
     main()

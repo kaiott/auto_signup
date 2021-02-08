@@ -29,11 +29,10 @@ def get_infos_fake(lesson):
     return free_spots, enroll_from, enroll_till
 
 def get_infos(lesson):
-    url = 'https://schalter.asvz.ch/tn-api/api/Lessons/' + str(lesson)
-    timestamp = str(datetime.now().timestamp()*1000)[0:13]
-    req_url = url + '?t=' + timestamp
-    print(req_url)
-    with uReq(req_url) as response:
+    api_url = 'https://schalter.asvz.ch/tn-api/api/Lessons/' + str(lesson)
+    timestamp = str(datetime.now().timestamp() * 1000)[0:13]
+    api_url = api_url + '?t=' + timestamp
+    with urlopen(api_url) as response:
         response = json.loads(response.read().decode())
 
     participantsMax = response.get('data').get('participantsMax')
