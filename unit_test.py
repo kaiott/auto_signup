@@ -5,6 +5,16 @@ from datetime import datetime, timedelta
 
 BASE = 'http://95.217.133.138/'
 
+def check_server_status():
+    response = requests.get(BASE + 'status')
+    try:
+      print(response.json())
+    except:
+      if response.text == '':
+        print(response.status_code)
+      else:
+        print(response.text)
+
 def add_lesson(lesson_id):
     try:
         requests.put(BASE + f'lessons/{lesson_id}', timeout = 0.5)
@@ -38,13 +48,6 @@ def delete_lesson(lesson_id):
 def direct_signup(round_):
     now = datetime.now().astimezone()
     lesson_id = 500 + round_
-    data = {"name": "Salsa", 
-           "enroll_from": (now-timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "enroll_until": (now+timedelta(hours=23)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "starts": (now+timedelta(hours=25)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "ends": "2021-04-15T21:00+02:00",
-           "maxParticipants": 15,
-           "countParticipants": 12}
     add_lesson(lesson_id)
     sleep(1)
     retrieve_lesson(lesson_id)
@@ -52,13 +55,6 @@ def direct_signup(round_):
 def wait_until_signup(round_):
     now = datetime.now().astimezone()
     lesson_id = 600 + round_
-    data = {"name": "Salsa", 
-           "enroll_from": (now+timedelta(minutes=2)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "enroll_until": (now+timedelta(hours=22, minutes=2)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "starts": (now+timedelta(hours=24, minutes=2)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "ends": "2021-04-15T21:00+02:00",
-           "maxParticipants": 15,
-           "countParticipants": 0}
     add_lesson(lesson_id)
     sleep(40)
     retrieve_lesson(lesson_id)
@@ -70,13 +66,6 @@ def wait_until_signup(round_):
 def wait_for_free_spots(round_):
     now = datetime.now().astimezone()
     lesson_id = 700 + round_
-    data = {"name": "Salsa", 
-           "enroll_from": (now-timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "enroll_until": (now+timedelta(hours=23)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "starts": (now+timedelta(hours=25)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "ends": "2021-04-15T21:00+02:00",
-           "maxParticipants": 15,
-           "countParticipants": 15}
     add_lesson(lesson_id)
     retrieve_lesson(lesson_id)
     sleep(40)
@@ -89,13 +78,6 @@ def wait_for_free_spots(round_):
 def directly_too_late(round_):
     now = datetime.now().astimezone()
     lesson_id = 800 + round_
-    data = {"name": "Salsa", 
-           "enroll_from": (now-timedelta(hours=23)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "enroll_until": (now-timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "starts": (now+timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "ends": "2021-04-15T21:00+02:00",
-           "maxParticipants": 15,
-           "countParticipants": 12}
     add_lesson(lesson_id)
     sleep(1)
     retrieve_lesson(lesson_id)
@@ -103,13 +85,6 @@ def directly_too_late(round_):
 def full_and_timeout(round_):
     now = datetime.now().astimezone()
     lesson_id = 900 + round_
-    data = {"name": "Salsa", 
-           "enroll_from": (now-timedelta(hours=23)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "enroll_until": (now+timedelta(minutes=2)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "starts": (now+timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S%z'),
-           "ends": "2021-04-15T21:00+02:00",
-           "maxParticipants": 15,
-           "countParticipants": 15}
     add_lesson(lesson_id)
     sleep(1)
     retrieve_lesson(lesson_id)
@@ -120,8 +95,7 @@ def full_and_timeout(round_):
     sleep(40)
     retrieve_lesson(lesson_id)
 
-
-def main():
+def test_on_fakes():
     round_ = 3
     retrieve_all_lessons()
     delete_lesson(601)
@@ -132,6 +106,15 @@ def main():
     directly_too_late(round_)
     full_and_timeout(round_)
     retrieve_all_lessons()
+
+
+def real_test():
+    add_lesson(174930) # body combat 09/02
+    add_lesson(174938) # muscle pump 10/02
+
+def main():
+    #test_on_fakes()
+    #
 
 if __name__ == "__main__":
     main()

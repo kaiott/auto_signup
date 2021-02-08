@@ -1,0 +1,9 @@
+deploy: (be sure to use wsgi-py3)
+https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
+
+change rights and group of path and files for apache:
+https://askubuntu.com/questions/767504/permissions-problems-with-var-www-html-and-my-own-home-directory-for-a-website
+
+in wsgi add virtualenv and other files to path
+
+sudo service apache2 restart
