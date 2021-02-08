@@ -26,6 +26,10 @@ minimal_fields = {
     'status': fields.Integer
 }
 
+class Status(Resource):
+    def check_status(self):
+        return {"status": "running"}
+
 class Lessons(Resource):
     @marshal_with(minimal_fields)
     def get(self):
@@ -58,6 +62,7 @@ class Lesson(Resource):
 
 api.add_resource(Lessons, "/lessons")
 api.add_resource(Lesson, "/lessons/<int:lesson_id>")
+api.add_resource(Status, "/status")
 
 if __name__ == "__main__":
     app.run(debug=True)
