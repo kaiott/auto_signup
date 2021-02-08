@@ -49,6 +49,7 @@ class Lessons(Resource):
 
     def delete(self):
         LessonModel.query.delete()
+        db.session.commit()
         return '', 204
 
 class Lesson(Resource):

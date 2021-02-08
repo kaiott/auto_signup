@@ -125,7 +125,11 @@ def real_test():
 
 def main():
     #test_on_fakes()
-    real_test()
+    check_server_status()
+    retrieve_all_lessons()
+    delete_all_entries()
+    retrieve_all_lessons()
+    #real_test()
 
 if __name__ == "__main__":
     main()
