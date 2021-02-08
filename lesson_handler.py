@@ -37,7 +37,9 @@ def get_infos(lesson):
 
     participantsMax = response.get('data').get('participantsMax')
     participantCount = response.get('data').get('participantCount')
-    free_spots = participantsMax - participantCount
+    free_spots = 1
+    if participantsMax is not None and participantCount is not None:
+        free_spots = participantsMax - participantCount
     enrollmentFrom = response.get('data').get('enrollmentFrom')
     enrollmentUntil = response.get('data').get('enrollmentUntil')
     enroll_from = datetime.strptime(enrollmentFrom, '%Y-%m-%dT%H:%M:%S%z')
