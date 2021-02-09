@@ -117,11 +117,17 @@ def test_on_fakes():
     full_and_timeout(round_)
     retrieve_all_lessons()
 
+def add_and_delete(lesson_id):
+    add_lesson(lesson_id)
+    sleep(40)
+    delete_lesson(lesson_id)
+
 
 def real_test():
     check_server_status()
-    add_lesson(174930) # body combat 09/02
-    add_lesson(174938) # muscle pump 10/02
+    #add_lesson(174930) # body combat 09/02
+    #add_lesson(174938) # muscle pump 10/02
+    add_and_delete(175100)
 
 def main():
     #test_on_fakes()

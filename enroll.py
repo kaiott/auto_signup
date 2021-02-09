@@ -25,15 +25,15 @@ def enroll(lesson, enroll_time):
         'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
         'Content-Length': '2'
     }
-    print_or_log(url)
+    print_or_log(f'id={lesson} has url {url}')
     pause.until(enroll_time-timedelta(milliseconds = 10))
     for i in range(10):
         try:
-            print_or_log(f'sending request')
+            print_or_log(f'id={lesson} sending request')
             requests.post(url, headers = headers, timeout = 0.2)
         except requests.exceptions.ReadTimeout:
-            print_or_log(f'deliberate timeout')
+            print_or_log(f'id={lesson} deliberate timeout')
             pass
 
-    print_or_log(f'done')
+    print_or_log(f'id={lesson} done')
 

@@ -29,6 +29,7 @@ def get_infos_fake(lesson):
     return free_spots, enroll_from, enroll_till
 
 def get_infos(lesson):
+    print_or_log(f'id={lesson} in get_infos')
     api_url = 'https://schalter.asvz.ch/tn-api/api/Lessons/' + str(lesson)
     timestamp = str(datetime.now().timestamp() * 1000)[0:13]
     api_url = api_url + '?t=' + timestamp
@@ -47,11 +48,10 @@ def get_infos(lesson):
     return free_spots, enroll_from, enroll_till
 
 def handle_lesson(session, model, lesson):
-    print_or_log(f'lesson {lesson} is handled')
+    print_or_log(f'id={lesson} in handle_lesson')
     try:
         free_spots, enroll_from, enroll_till = get_infos(lesson)
         now = datetime.now().astimezone()
-        print_or_log(f'before deciding {lesson}')
         if now < enroll_from:
             print_or_log(f'option 1 {lesson}')
             hold(session, model, lesson, enroll_from)
@@ -69,35 +69,38 @@ def handle_lesson(session, model, lesson):
 
 
 def hold(session, model, lesson, enroll_time):
-    print_or_log(f'lesson {lesson} in hold')
+    print_or_log(f'id={lesson} in hold')
     model.query.filter_by(lesson_id=lesson).first().status = WAITING_FOR_SIGNUP
     session.commit()
     pause.until(enroll_time.replace(tzinfo=None)-timedelta(seconds=55))
     if model.query.filter_by(lesson_id=lesson).first() is not None:
         print_or_log(f'sending lesson {lesson} from hold to enroll')
-        model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL 
+        model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #TODO check this later
         enroll.enroll(lesson, enroll_time.replace(tzinfo=None)) 
         session.commit()
+    else:
+        print_or_log(f'id={lesson} deleted while in hold')
 
 def watch(session, model, lesson):
-    print_or_log(f'lesson {lesson} in watch')
+    print_or_log(f'id={lesson} in watch')
     model.query.filter_by(lesson_id=lesson).first().status = MONITORING_FOR_SLOTS
     session.commit()
     while model.query.filter_by(lesson_id=lesson).first():
         free_spots, enroll_from, enroll_till = get_infos(lesson)
+        if datetime.now().astimezone() >= enroll_till:
+            print_or_log(f'id={lesson} has timed out in watch')
+            give_up(session, model, lesson)
+            return
         if free_spots > 0:
-            print_or_log(f'lesson {lesson} has {free_spots} free spots, sending to enroll')
-            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL 
+            print_or_log(f'id={lesson} has {free_spots} free spots in watch')
+            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #TODO check this later
             enroll.enroll(lesson, enroll_from.replace(tzinfo=None))
             session.commit()
-            break
+            return
         sleep(60)
-        if datetime.now().astimezone() >= enroll_till:
-            print_or_log(f'too late for lesson {lesson}, sending to give up')
-            give_up(session, model, lesson)
-            break
+    print_or_log(f'id={lesson} deleted while in watch')
 
 def give_up(session, model, lesson):
-    print_or_log(f'giving up on lesson {lesson}')
+    print_or_log(f'id={lesson} in give_up')
     model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_MISSED
     session.commit()
