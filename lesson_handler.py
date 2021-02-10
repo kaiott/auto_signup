@@ -62,12 +62,12 @@ def get_variable_info(lesson):
 
 def handle_lesson(session, model, lesson):
     print_or_log(f'id={lesson} in handle_lesson')
-    lesson_obj = LessonModel(lesson_id=lesson, status=STATUS_PENDING, title='Not Found',
+    lesson_obj = model(lesson_id=lesson, status=STATUS_PENDING, title='Not Found',
                              starts='1999-01-01T03:00:00+01:00', ends='1999-01-01T04:00:00+01:00')
     session.add(lesson_obj)
     session.commit()
     try:
-        title, starts, end = get_fixed_info(lesson)
+        title, starts, ends = get_fixed_info(lesson)
         lesson_obj.title=title
         lesson_obj.starts=starts
         lesson_obj.ends=ends

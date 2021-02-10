@@ -3,7 +3,7 @@ import pause
 from datetime import datetime, timedelta
 from pprint import pprint
 from logger import print_or_log
-import time.sleep
+import time
 
 def enroll(lesson, enroll_time):
     with open('/var/www/FlaskApp/FlaskApp/token') as file:
@@ -60,13 +60,13 @@ def check_enrollment(lesson):
         'Referer': f'https://schalter.asvz.ch/tn/lessons/{lesson}',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
-        'DNT': 1
+        'DNT': '1'
     }
     print_or_log(f'id={lesson} trying to check enrollment')
     response = requests.get(url, headers = headers)
     print_or_log(f'id={lesson} got response {str(response)}')
     if response.status_code == 404:
         return False
-    else if response.status_code == 500:
+    elif response.status_code == 500:
         return False
     return True

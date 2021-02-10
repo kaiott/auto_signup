@@ -9,7 +9,7 @@ from logger import print_or_log
 try:
     from lesson_handler import handle_lesson
 except Exception as e:
-    text = str(e)
+    print_or_log(f'import error {str(e)}')
 from havefun import havefun
 
 app = Flask(__name__)
