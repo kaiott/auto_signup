@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 import os.path
 text = 'import worekd'
+from logger import print_or_log
 try:
     from lesson_handler import handle_lesson
 except Exception as e:
@@ -69,8 +70,10 @@ class Lesson(Resource):
     @marshal_with(minimal_fields)
     def put(self, lesson_id):
         result = LessonModel.query.filter_by(lesson_id=lesson_id).first()
+        print_or_log(f'id={lesson_id} came in put request')
         if result:
             abort(409, message="Lesson id taken and " + havefun())
+        print_or_log(f'id={lesson_id} before handling')
         handle_lesson(db.session, LessonModel, lesson_id)
         return lesson, 201 #this ansewr will actually not send until we either signed up, are past due date or an error occurred, put requests will just time out, to fix this we need to start threads
 

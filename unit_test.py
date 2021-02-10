@@ -27,8 +27,16 @@ def delete_all_entries():
 
 def add_lesson(lesson_id):
     try:
-        requests.put(BASE + f'lessons/{lesson_id}', timeout = 0.5)
+        response = requests.put(BASE + f'lessons/{lesson_id}', timeout = 0.5)
+        try:
+            print(response.json())
+        except:
+            if response.text == '':
+                print(response.status_code)
+            else:
+                print(response.text)
     except requests.exceptions.ReadTimeout:
+        print(f"{lesson_id} timed out")
         pass
 
 def retrieve_all_lessons():
@@ -133,9 +141,12 @@ def main():
     #test_on_fakes()
     check_server_status()
     retrieve_all_lessons()
+    add_lesson(174892)
+    add_lesson(174922)
+    retrieve_all_lessons()
     #delete_all_entries()
     #retrieve_all_lessons()
-    real_test()
+    #real_test()
 
 if __name__ == "__main__":
     main()
