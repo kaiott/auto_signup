@@ -133,8 +133,8 @@ def main():
     #test_on_fakes()
     check_server_status()
     retrieve_all_lessons()
-    delete_all_entries()
-    retrieve_all_lessons()
+    #delete_all_entries()
+    #retrieve_all_lessons()
     real_test()
 
 if __name__ == "__main__":

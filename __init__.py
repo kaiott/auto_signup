@@ -20,12 +20,18 @@ db = SQLAlchemy(app)
 class LessonModel(db.Model):
     lesson_id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(50), nullable=False)
+    starts = db.Column(db.String(50), nullable=False)
+    ends = db.Column(db.String(50), nullable=False)
 
 #db.create_all()
 
 minimal_fields = {
     'lesson_id': fields.Integer,
-    'status': fields.Integer
+    'status': fields.Integer,
+    'title': fields.String,
+    'starts': fields.String,
+    'ends': fields.String
 }
 
 
@@ -65,9 +71,6 @@ class Lesson(Resource):
         result = LessonModel.query.filter_by(lesson_id=lesson_id).first()
         if result:
             abort(409, message="Lesson id taken and " + havefun())
-        lesson = LessonModel(lesson_id=lesson_id, status=0)
-        db.session.add(lesson)
-        db.session.commit()
         handle_lesson(db.session, LessonModel, lesson_id)
         return lesson, 201 #this ansewr will actually not send until we either signed up, are past due date or an error occurred, put requests will just time out, to fix this we need to start threads
 

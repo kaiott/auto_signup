@@ -28,8 +28,21 @@ def get_infos_fake(lesson):
     print_or_log(f'got fake data for lesson {lesson}')
     return free_spots, enroll_from, enroll_till
 
-def get_infos(lesson):
-    print_or_log(f'id={lesson} in get_infos')
+def get_fixed_info(lesson):
+    print_or_log(f'id={lesson} in get_fixed_info')
+    api_url = 'https://schalter.asvz.ch/tn-api/api/Lessons/' + str(lesson)
+    timestamp = str(datetime.now().timestamp() * 1000)[0:13]
+    api_url = api_url + '?t=' + timestamp
+    with urlopen(api_url) as response:
+        response = json.loads(response.read().decode())
+
+    title = response.get('data').get('sportName') # is shorter than title, for example sportsName='Kondi', title='Supder Kondi Body Attack LIVESTREAM'
+    starts = response.get('data').get('starts')
+    ends = response.get('data').get('ends')
+    return title, starts, ends
+
+def get_variable_info(lesson):
+    print_or_log(f'id={lesson} in get_variable_info')
     api_url = 'https://schalter.asvz.ch/tn-api/api/Lessons/' + str(lesson)
     timestamp = str(datetime.now().timestamp() * 1000)[0:13]
     api_url = api_url + '?t=' + timestamp
@@ -49,8 +62,17 @@ def get_infos(lesson):
 
 def handle_lesson(session, model, lesson):
     print_or_log(f'id={lesson} in handle_lesson')
+    lesson_obj = LessonModel(lesson_id=lesson, status=STATUS_PENDING, title='Not Found',
+                             starts='1999-01-01T03:00:00+01:00', ends='1999-01-01T04:00:00+01:00')
+    session.add(lesson_obj)
+    session.commit()
     try:
-        free_spots, enroll_from, enroll_till = get_infos(lesson)
+        title, starts, end = get_fixed_info(lesson)
+        lesson_obj.title=title
+        lesson_obj.starts=starts
+        lesson_obj.ends=ends
+        session.commit()
+        free_spots, enroll_from, enroll_till = get_variable_info(lesson)
         now = datetime.now().astimezone()
         if now < enroll_from:
             print_or_log(f'option 1 {lesson}')
@@ -86,7 +108,7 @@ def watch(session, model, lesson):
     model.query.filter_by(lesson_id=lesson).first().status = MONITORING_FOR_SLOTS
     session.commit()
     while model.query.filter_by(lesson_id=lesson).first():
-        free_spots, enroll_from, enroll_till = get_infos(lesson)
+        free_spots, enroll_from, enroll_till = get_variable_info(lesson)
         if datetime.now().astimezone() >= enroll_till:
             print_or_log(f'id={lesson} has timed out in watch')
             give_up(session, model, lesson)
