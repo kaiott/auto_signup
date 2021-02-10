@@ -74,8 +74,11 @@ class Lesson(Resource):
         if result:
             abort(409, message="Lesson id taken and " + havefun())
         print_or_log(f'id={lesson_id} before handling')
-        handle_lesson(db.session, LessonModel, lesson_id)
-        return lesson, 201 #this ansewr will actually not send until we either signed up, are past due date or an error occurred, put requests will just time out, to fix this we need to start threads
+        try:
+            handle_lesson(db.session, LessonModel, lesson_id)
+        except Exception as e:
+            print_or_log(f'id={lesson_id} has error {str(e)}')
+        return get(lesson_id), 201 #this ansewr will actually not send until we either signed up, are past due date or an error occurred, put requests will just time out, to fix this we need to start threads
 
     def delete(self, lesson_id):
         LessonModel.query.filter_by(lesson_id=lesson_id).delete()
