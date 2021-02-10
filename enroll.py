@@ -69,4 +69,6 @@ def check_enrollment(lesson):
         return False
     elif response.status_code == 500:
         return False
+    elif response.json()["data"]["status"]==6:
+        return False
     return True
