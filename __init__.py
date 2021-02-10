@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import os.path
 text = 'import worekd'
 from logger import print_or_log
+from enroll import check_enrollment
 try:
     from lesson_handler import handle_lesson
 except Exception as e:
@@ -45,6 +46,19 @@ class Status(Resource):
             d = datetime.fromtimestamp(t)
             if datetime.now() - d < timedelta(hours=2):
                 token_status = "up_to_date"
+        try:
+            lessons = LessonModel.query.all()
+            for lesson in lessons:
+                lesson_id = lesson.lesson_id
+                is_enrolled = check_enrollment(lesson_id)
+                if is_enrolled:
+                    lesson.status=2 #SIGN_UP_SUCCESSFUL
+                elif lesson.status==2: #if status is enrolled but actually not
+                    lesson.status=6
+            db.session.commit()
+        except Exception as e:
+            print_or_log(f"updating of statuses per request at asvz did not work: {str(e)}")
+
         return {"server_status": "running",
                 "token_status": token_status}
 

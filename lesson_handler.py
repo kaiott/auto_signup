@@ -14,6 +14,7 @@ SIGN_UP_SUCCESSFUL = 2
 SIGN_UP_MISSED = 3
 STATUS_PENDING = 4
 ERROR_OCCURRED = 5
+ENROLLMENT_REMOVED = 6
 
 #just for testing with custom data
 def get_infos_fake(lesson):
@@ -97,9 +98,14 @@ def hold(session, model, lesson, enroll_time):
     pause.until(enroll_time.replace(tzinfo=None)-timedelta(seconds=55))
     if model.query.filter_by(lesson_id=lesson).first() is not None:
         print_or_log(f'sending lesson {lesson} from hold to enroll')
-        model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #TODO check this later
-        enroll.enroll(lesson, enroll_time.replace(tzinfo=None)) 
+        model.query.filter_by(lesson_id=lesson).first().status = STATUS_PENDING
         session.commit()
+        res = enroll.enroll(lesson, enroll_time.replace(tzinfo=None))
+        if res: 
+            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL
+            session.commit()
+        else:
+            watch(session, model, lesson)
     else:
         print_or_log(f'id={lesson} deleted while in hold')
 
@@ -115,10 +121,16 @@ def watch(session, model, lesson):
             return
         if free_spots > 0:
             print_or_log(f'id={lesson} has {free_spots} free spots in watch')
-            model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL #TODO check this later
-            enroll.enroll(lesson, enroll_from.replace(tzinfo=None))
+            model.query.filter_by(lesson_id=lesson).first().status = STATUS_PENDING
             session.commit()
-            return
+            res = enroll.enroll(lesson, enroll_from.replace(tzinfo=None))
+            if res:
+                model.query.filter_by(lesson_id=lesson).first().status = SIGN_UP_SUCCESSFUL
+                session.commit()
+                return
+            else:
+                model.query.filter_by(lesson_id=lesson).first().status = MONITORING_FOR_SLOTS
+                session.commit()
         sleep(60)
     print_or_log(f'id={lesson} deleted while in watch')
 
